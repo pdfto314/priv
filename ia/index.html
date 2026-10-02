@@ -1,15 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>IA</title>
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
+  <style>
+    body { font-family: system-ui, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 16px; box-sizing: border-box; text-align: center; }
+  </style>
 </head>
 <body>
+  <p id="status">Redirecionando…</p>
+  <noscript>Ative o JavaScript para ser redirecionado.</noscript>
   <script>
-    window.location.replace("https://wit-organisms-ronald-kitty.trycloudflare.com?t=" + Date.now());
+    // O endereço do túnel fica em link.txt; buscamos sempre a versão mais recente
+    // para não depender do cache do GitHub Pages nem do navegador.
+    (async () => {
+      const status = document.getElementById("status");
+      try {
+        const res = await fetch("link.txt?t=" + Date.now(), { cache: "no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+
+        const link = (await res.text()).trim();
+        if (!link.startsWith("https://")) {
+          status.textContent = "A IA está offline no momento. Tente novamente mais tarde.";
+          return;
+        }
+
+        const target = new URL(link);
+        target.searchParams.set("t", Date.now());
+        location.replace(target);
+      } catch (err) {
+        status.textContent = "Não foi possível obter o link da IA (" + err.message + "). Recarregue a página.";
+      }
+    })();
   </script>
 </body>
 </html>
